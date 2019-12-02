@@ -1,4 +1,4 @@
-#elliptic-curve
+# elliptic-curve
 
 GitHub page: <https://github.com/zhangyuesai/elliptic-curve>
 
@@ -25,7 +25,7 @@ A screenshot of the program running is as follows.
 
 ![image](screenshot.png)
 
-We have already known that Pollard's rho algorithm runs in `O(n)` time, where `n` is the order of the elliptic curve. In the program running shown above, each parameter set's `n` is approximately 4 times of that in the previous set, and the number of steps `k` is approximately twice. This confirms that my implementation of Pollard's rho algorithm does run in `O(n)` time, and is very likely to be correct.
+We have already known that Pollard's rho algorithm runs in $O(\sqrt{n})$ time, where $n$ is the order of the elliptic curve. In the program running shown above, each parameter set's `n` is approximately 4 times of that in the previous set, and the number of steps `k` is approximately twice. This confirms that my implementation of Pollard's rho algorithm does run in $O(\sqrt{n})$ time, and is very likely to be correct.
 
 
 ## Reference
