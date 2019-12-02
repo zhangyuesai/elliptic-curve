@@ -77,12 +77,11 @@ public class ECPoint {
      */
     public static BigInteger[] rho(BigInteger[] a, BigInteger[] b, BigInteger d, BigInteger p, BigInteger n)
             throws SextupleInitializationException {
-        BigInteger alpha_k = BigInteger.valueOf(0);
-        BigInteger beta_k = BigInteger.valueOf(0);
+        BigInteger[] alphaBeta_k = new BigInteger[]{BigInteger.valueOf(0), BigInteger.valueOf(0)};
         BigInteger[] z_k = ECPoint.point("0", "1");
-        BigInteger alpha_2k = BigInteger.valueOf(0);
-        BigInteger beta_2k = BigInteger.valueOf(0);
+        BigInteger[] alphaBeta_2k = new BigInteger[]{BigInteger.valueOf(0), BigInteger.valueOf(0)};
         BigInteger[] z_2k = ECPoint.point("0", "1");
+
         BigInteger m;
         BigInteger k;
 
@@ -90,57 +89,37 @@ public class ECPoint {
         while (!Arrays.equals(z_k, z_2k) || k.equals(BigInteger.valueOf(0))) {
             k = k.add(BigInteger.valueOf(1));
 
-            // update alpha_k, beta_k, z_k
-            if (z_k[0].mod(BigInteger.valueOf(3)).equals(BigInteger.valueOf(0))) {
-                z_k = ECPoint.mul(b, z_k, d, p);
-                alpha_k = alpha_k.add(BigInteger.valueOf(1));
-                // beta_k = beta_k;
-            } else if (z_k[0].mod(BigInteger.valueOf(3)).equals(BigInteger.valueOf(1))) {
-                z_k = ECPoint.mul(z_k, z_k, d, p);
-                alpha_k = alpha_k.multiply(BigInteger.valueOf(2));
-                beta_k = beta_k.multiply(BigInteger.valueOf(2));
-            } else {
-                z_k = ECPoint.mul(a, z_k, d, p);
-                // alpha_k = alpha_k;
-                beta_k = beta_k.add(BigInteger.valueOf(1));
-            }
-
-            // update alpha_2k, beta_2k, z_2k
-            if (z_2k[0].mod(BigInteger.valueOf(3)).equals(BigInteger.valueOf(0))) {
-                z_2k = ECPoint.mul(b, z_2k, d, p);
-                alpha_2k = alpha_2k.add(BigInteger.valueOf(1));
-                // beta_2k = beta_2k;
-            } else if (z_2k[0].mod(BigInteger.valueOf(3)).equals(BigInteger.valueOf(1))) {
-                z_2k = ECPoint.mul(z_2k, z_2k, d, p);
-                alpha_2k = alpha_2k.multiply(BigInteger.valueOf(2));
-                beta_2k = beta_2k.multiply(BigInteger.valueOf(2));
-            } else {
-                z_2k = ECPoint.mul(a, z_2k, d, p);
-                // alpha_2k = alpha_2k;
-                beta_2k = beta_2k.add(BigInteger.valueOf(1));
-            }
-            if (z_2k[0].mod(BigInteger.valueOf(3)).equals(BigInteger.valueOf(0))) {
-                z_2k = ECPoint.mul(b, z_2k, d, p);
-                alpha_2k = alpha_2k.add(BigInteger.valueOf(1));
-                // beta_2k = beta_2k;
-            } else if (z_2k[0].mod(BigInteger.valueOf(3)).equals(BigInteger.valueOf(1))) {
-                z_2k = ECPoint.mul(z_2k, z_2k, d, p);
-                alpha_2k = alpha_2k.multiply(BigInteger.valueOf(2));
-                beta_2k = beta_2k.multiply(BigInteger.valueOf(2));
-            } else {
-                z_2k = ECPoint.mul(a, z_2k, d, p);
-                // alpha_2k = alpha_2k;
-                beta_2k = beta_2k.add(BigInteger.valueOf(1));
-            }
+            updateAlphaBetaZ(alphaBeta_k, z_k, a, b, d, p);
+            updateAlphaBetaZ(alphaBeta_2k, z_2k, a, b, d, p);
+            updateAlphaBetaZ(alphaBeta_2k, z_2k, a, b, d, p);
         }
 
-        if (alpha_k.subtract(alpha_2k).mod(n).equals(BigInteger.valueOf(0))) {
+        if (alphaBeta_k[0].subtract(alphaBeta_2k[0]).mod(n).equals(BigInteger.valueOf(0))) {
             throw new SextupleInitializationException();
         }
 
-        m = (beta_2k.subtract(beta_k)).multiply((alpha_k.subtract(alpha_2k)).modInverse(n)).mod(n);
+        m = (alphaBeta_2k[1].subtract(alphaBeta_k[1])).multiply((alphaBeta_k[0].subtract(alphaBeta_2k[0])).modInverse(n)).mod(n);
 
         return new BigInteger[]{m, k};
+    }
+
+    private static void updateAlphaBetaZ(BigInteger[] alphaBeta, BigInteger[] z, BigInteger[] a, BigInteger[] b, BigInteger d, BigInteger p) {
+        BigInteger[] _z;
+        if (z[0].mod(BigInteger.valueOf(3)).equals(BigInteger.valueOf(0))) {
+            _z = ECPoint.mul(b, z, d, p);
+            alphaBeta[0] = alphaBeta[0].add(BigInteger.valueOf(1));
+            // alphaBeta[1] = alphaBeta[1];
+        } else if (z[0].mod(BigInteger.valueOf(3)).equals(BigInteger.valueOf(1))) {
+            _z = ECPoint.mul(z, z, d, p);
+            alphaBeta[0] = alphaBeta[0].multiply(BigInteger.valueOf(2));
+            alphaBeta[1] = alphaBeta[1].multiply(BigInteger.valueOf(2));
+        } else {
+            _z = ECPoint.mul(a, z, d, p);
+            // alphaBeta[0] = alphaBeta[0];
+            alphaBeta[1] = alphaBeta[1].add(BigInteger.valueOf(1));
+        }
+        z[0] = _z[0];
+        z[1] = _z[1];
     }
 
 
