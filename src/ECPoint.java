@@ -103,6 +103,7 @@ public class ECPoint {
         return new BigInteger[]{m, k};
     }
 
+    /* Reduces code duplication */
     private static void updateAlphaBetaZ(BigInteger[] alphaBeta, BigInteger[] z, BigInteger[] a, BigInteger[] b, BigInteger d, BigInteger p) {
         BigInteger[] _z;
         if (z[0].mod(BigInteger.valueOf(3)).equals(BigInteger.valueOf(0))) {
